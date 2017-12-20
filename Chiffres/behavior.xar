@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ChoregrapheProject xmlns="http://www.aldebaran-robotics.com/schema/choregraphe/project.xsd" xar_version="3">
+    <Box name="root" id="-1" localization="8" tooltip="Root box of Choregraphe&apos;s behavior. Highest level possible." x="0" y="0">
+        <bitmap>media/images/box/root.png</bitmap>
+        <script language="4">
+            <content>
+                <![CDATA[]]>
+</content>
+        </script>
+        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+        <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+        <Timeline enable="0">
+            <BehaviorLayer name="behavior_layer1">
+                <BehaviorKeyframe name="keyframe1" index="1">
+                    <Diagram>
+                        <Box name="Trace_1" id="1" localization="8" tooltip="" x="621" y="38">
+                            <bitmap>media/images/box/box-python-script.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import sys
+import motion
+import almath
+from naoqi import ALProxy
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        self.nTries = 0
+        self.postureProxy = ALProxy("ALRobotPosture")
+        self.motionProxy= ALProxy("ALMotion")
+        pass
+
+    def onUnload(self):
+        self.postureProxy.stopMove()
+
+    def onInput_onStart(self):
+        self.motionProxy.setStiffnesses("RShoulderPitch", 0.0)
+
+        names  = ["RShoulderPitch"]
+        angles  = [0.7]
+        fractionMaxSpeed  = 0.1
+        self.motionProxy.setAngles(names, angles, fractionMaxSpeed)
+
+        time.sleep(3.0)
+        self.motionProxy.setStiffnesses("RShoulderPitch", 1.0)
+        pass
+
+
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                        </Box>
+                        <Box name="Trace_2" id="2" localization="8" tooltip="" x="376" y="46">
+                            <bitmap>media/images/box/box-python-script.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import sys
+import motion
+import almath
+from naoqi import ALProxy
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        self.nTries = 0
+        self.postureProxy = ALProxy("ALRobotPosture")
+        self.motionProxy= ALProxy("ALMotion")
+        pass
+
+    def onUnload(self):
+        self.postureProxy.stopMove()
+
+    def onInput_onStart(self):
+        self.postureProxy.goToPosture("Crouch", 1.0)
+
+        effector   = "RArm"
+        frame      = motion.FRAME_TORSO
+        axisMask   = almath.AXIS_MASK_VEL # just control position
+        useSensorValues = False
+
+        path = []
+        currentTf = self.motionProxy.getTransform(effector, frame, useSensorValues)
+        # point 1
+        targetTf  = almath.Transform(currentTf)
+        targetTf.r2_c4 -= 0.05 # y
+        path.append(list(targetTf.toVector()))
+
+        # point 2
+        targetTf  = almath.Transform(currentTf)
+        targetTf.r3_c4 += 0.04 # z
+        path.append(list(targetTf.toVector()))
+
+        # point 3
+        targetTf  = almath.Transform(currentTf)
+        targetTf.r2_c4 += 0.04 # y
+        path.append(list(targetTf.toVector()))
+
+        # point 4
+        targetTf  = almath.Transform(currentTf)
+        targetTf.r3_c4 -= 0.02 # z
+        path.append(list(targetTf.toVector()))
+
+        # point 5
+        targetTf  = almath.Transform(currentTf)
+        targetTf.r2_c4 -= 0.05 # y
+        path.append(list(targetTf.toVector()))
+
+        # point 6
+        path.append(currentTf)
+
+        times = [0.5, 1.0, 2.0, 3.0, 4.0, 4.5] # seconds
+
+        self.motionProxy.transformInterpolations(effector, frame, path, axisMask, times)
+        # Go to rest position
+        #self.motionProxy.rest()
+
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                        </Box>
+                        <Box name="Trace_3" id="3" localization="8" tooltip="" x="241" y="32">
+                            <bitmap>media/images/box/box-python-script.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import sys
+import motion
+import almath
+from naoqi import ALProxy
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        self.nTries = 0
+        self.postureProxy = ALProxy("ALRobotPosture")
+        self.motionProxy= ALProxy("ALMotion")
+        pass
+
+    def onUnload(self):
+        self.postureProxy.stopMove()
+
+    def onInput_onStart(self):
+        self.postureProxy.goToPosture("Crouch", 1.0)
+
+        effector   = "RArm"
+        frame      = motion.FRAME_TORSO
+        axisMask   = almath.AXIS_MASK_VEL # just control position
+        useSensorValues = False
+
+        path = []
+        currentTf = self.motionProxy.getTransform(effector, frame, useSensorValues)
+        # point 1
+        targetTf  = almath.Transform(currentTf)
+        targetTf.r1_c4 += 0.05 # y
+        path.append(list(targetTf.toVector()))
+
+
+        # point 6
+        path.append(currentTf)
+
+        times = [0.5,4.5] # seconds
+
+        self.motionProxy.transformInterpolations(effector, frame, path, axisMask, times)
+        #Go to rest position
+        #self.motionProxy.rest()
+
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                        </Box>
+                        <Box name="Trace_4" id="4" localization="8" tooltip="" x="137" y="23">
+                            <bitmap>media/images/box/box-python-script.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import sys
+import motion
+import almath
+from naoqi import ALProxy
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        self.nTries = 0
+        self.postureProxy = ALProxy("ALRobotPosture")
+        self.motionProxy= ALProxy("ALMotion")
+        pass
+
+    def onUnload(self):
+        self.postureProxy.stopMove()
+
+    def onInput_onStart(self):
+        self.postureProxy.goToPosture("Crouch", 1.0)
+        effector   = "RArm"
+        frame      = motion.FRAME_TORSO
+        axisMask   = almath.AXIS_MASK_VEL # just control position
+        useSensorValues = False
+
+        path = []
+        currentTf = self.motionProxy.getTransform(effector, frame, useSensorValues)
+        targetTf  = almath.Transform(currentTf)
+        targetTf.r1_c4 += 0.1 # x
+        #targetTf.r2_c4 += 0.01 # y
+        targetTf.r3_c4 += 0.2 # z
+        path.append(list(targetTf.toVector()))
+
+        path.append(currentTf)
+
+        # Go to the target and back again
+        times      = [2.0, 4.0] # seconds
+
+        self.motionProxy.transformInterpolations(effector, frame, path, axisMask, times)
+
+        # Go to rest position
+        #self.motionProxy.rest()
+
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                        </Box>
+                        <Box name="Trace 5" id="5" localization="8" tooltip="" x="499" y="12">
+                            <bitmap>media/images/box/box-python-script.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import sys
+import motion
+import almath
+from naoqi import ALProxy
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        self.postureProxy = ALProxy("ALRobotPosture")
+        self.motionProxy= ALProxy("ALMotion")
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+
+    def onInput_onStart(self):
+        # Set NAO in Stiffness On
+        self.motionProxy.setStiffnesses('Body',1.0)
+        # Send NAO to Pose Init
+        self.postureProxy.goToPosture("Crouch", 1.0)
+
+        effector   = "RArm"
+        space      = motion.FRAME_TORSO
+        axisMask   = almath.AXIS_MASK_VEL    # just control position
+        isAbsolute = False
+
+        # Since we are in relative, the current position is zero
+        currentPos = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+        # Define the changes relative to the current position
+        dx         =  0.04      # translation axis X (meters)
+        dy         =  -0.02      # translation axis Y (meters)
+        dz         =  0.09      # translation axis Z (meters)
+        dwx        =  0.00      # rotation axis X (radians)
+        dwy        =  0.00      # rotation axis Y (radians)
+        dwz        =  0.00      # rotation axis Z (radians)
+        targetPos  = [dx, dy, dz, dwx, dwy, dwz]
+
+                # Define the changes relative to the current position
+        dx         =  0.04      # translation axis X (meters)
+        dy         =  -0.02      # translation axis Y (meters)
+        dz         =  0.09      # translation axis Z (meters)
+        dwx        =  0.00      # rotation axis X (radians)
+        dwy        =  0.00      # rotation axis Y (radians)
+        dwz        =  0.00      # rotation axis Z (radians)
+        targetPos2  = [dx, dy, dz, dwx, dwy, dwz]
+
+        # Go to the target and back again
+        path       = [targetPos, targetPos2]
+        times      = [2.0,4.0] # seconds
+
+        self.motionProxy.positionInterpolation(effector, space, path, axisMask, times, isAbsolute)
+
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                        </Box>
+                        <Box name="Hold_Pen" id="6" localization="8" tooltip="" x="899" y="190">
+                            <bitmap>media/images/box/box-python-script.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import sys
+import motion
+import almath
+from naoqi import ALProxy
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        self.postureProxy = ALProxy("ALRobotPosture")
+        self.motionProxy= ALProxy("ALMotion")
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+
+    def onInput_onStart(self):
+        # Set NAO in Stiffness On
+        self.motionProxy.setStiffnesses('Body',1.0)
+        # Send NAO to Pose Init
+        self.postureProxy.goToPosture("Crouch", 1.0)
+
+        effector   = "RArm"
+        space      = motion.SPACE_NAO
+        axisMask   = almath.AXIS_MASK_VEL    # just control position
+        isAbsolute = False
+
+        # Since we are in relative, the current position is zero
+        currentPos = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+        # Define the changes relative to the current position
+        dx         =  0.04      # translation axis X (meters)
+        dy         =  -0.02      # translation axis Y (meters)
+        dz         =  0.09      # translation axis Z (meters)
+        dwx        =  0.00      # rotation axis X (radians)
+        dwy        =  0.00      # rotation axis Y (radians)
+        dwz        =  0.00      # rotation axis Z (radians)
+        targetPos  = [dx, dy, dz, dwx, dwy, dwz]
+
+        # Go to the target and back again
+        path       = [targetPos]
+        times      = [2.0] # seconds
+
+        self.motionProxy.positionInterpolation(effector, space, path, axisMask, times, isAbsolute)
+
+        handName  = 'RHand'
+        self.motionProxy.openHand(handName)
+
+        self.motionProxy.closeHand(handName)
+
+
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                        </Box>
+                        <Box name="Init" id="12" localization="8" tooltip="" x="574" y="273">
+                            <bitmap>media/images/box/box-python-script.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        self.postureProxy = ALProxy("ALRobotPosture")
+        self.motionProxy= ALProxy("ALMotion")
+        pass
+
+    def onUnload(self):
+
+
+        pass
+
+    def onInput_onStart(self):
+        self.postureProxy.applyPosture("Crouch", 1.0)
+        # Choregraphe simplified export in Python.
+
+        handName  = 'RHand'
+        self.motionProxy.openHand(handName)
+
+        self.motionProxy.closeHand(handName)
+        #self.onStopped() #activate the output of the box
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        #self.onStopped() #activate the output of the box]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                        </Box>
+                        <Link inputowner="6" indexofinput="2" outputowner="0" indexofoutput="2" />
+                    </Diagram>
+                </BehaviorKeyframe>
+            </BehaviorLayer>
+        </Timeline>
+    </Box>
+</ChoregrapheProject>
